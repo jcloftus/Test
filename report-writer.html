@@ -3,557 +3,693 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Report Writer</title>
+  <title>FST Report Writer</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #f0f2f5;
-      color: #1a1a2e;
-      min-height: 100vh;
+    :root {
+      --sb: #0b1120;
+      --sb-surface: #151f32;
+      --sb-border: #1e2d45;
+      --sb-text: #94aac7;
+      --sb-text-dim: #3d5270;
+      --accent: #3e7bfa;
+      --main-bg: #f0f4f8;
+      --paper: #ffffff;
+      --text: #1a243a;
+      --text-mid: #3d5270;
+      --text-light: #7a8fa8;
+      --hgn: #7c3aed;
+      --wat: #0284c7;
+      --ols: #059669;
     }
 
-    header {
-      background: #1a1a2e;
-      color: #fff;
-      padding: 18px 32px;
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--main-bg);
+      display: flex;
+      min-height: 100vh;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    /* ══════════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════════ */
+    .sidebar {
+      width: 390px;
+      min-width: 390px;
+      background: var(--sb);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #1e2d45 transparent;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: #1e2d45; border-radius: 2px; }
+
+    /* Logo / header */
+    .sb-head {
+      padding: 22px 22px 18px;
+      border-bottom: 1px solid var(--sb-border);
+    }
+    .sb-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(62,123,250,.18);
+      color: #7aabff;
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 20px;
+      border: 1px solid rgba(62,123,250,.28);
+      margin-bottom: 9px;
+    }
+    .sb-badge svg { flex-shrink: 0; }
+    .sb-head h1 { color: #dce8ff; font-size: 1rem; font-weight: 700; }
+    .sb-head p  { color: var(--sb-text-dim); font-size: .75rem; margin-top: 2px; }
+
+    /* Body */
+    .sb-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    /* Cards */
+    .fc {
+      background: var(--sb-surface);
+      border-radius: 10px;
+      border: 1px solid var(--sb-border);
+      overflow: hidden;
+    }
+    .fc-head {
       display: flex;
       align-items: center;
-      gap: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+      gap: 9px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--sb-border);
     }
-    header h1 { font-size: 1.3rem; font-weight: 600; letter-spacing: .3px; }
-    header svg { opacity: .8; }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 24px;
-      max-width: 1300px;
-      margin: 28px auto;
-      padding: 0 20px;
+    .fc-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
-
-    /* ── Sidebar ── */
-    .sidebar { display: flex; flex-direction: column; gap: 16px; }
-
-    .card {
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 1px 4px rgba(0,0,0,.08);
-    }
-    .card h2 {
-      font-size: .8rem;
+    .fc-head h2 {
+      font-size: .68rem;
       font-weight: 700;
+      letter-spacing: .9px;
       text-transform: uppercase;
-      letter-spacing: .8px;
-      color: #6b7280;
-      margin-bottom: 14px;
+      color: var(--sb-text);
+    }
+    .fc-body {
+      padding: 13px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
     }
 
-    .field { margin-bottom: 12px; }
-    .field label {
+    /* Text inputs */
+    .f-label {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      color: var(--sb-text-dim);
       display: block;
-      font-size: .78rem;
-      font-weight: 600;
-      color: #374151;
       margin-bottom: 4px;
     }
-    .field input, .field select {
+    .f-input {
       width: 100%;
-      padding: 8px 10px;
-      border: 1.5px solid #d1d5db;
-      border-radius: 6px;
-      font-size: .88rem;
-      color: #111;
+      background: var(--sb);
+      border: 1.5px solid var(--sb-border);
+      border-radius: 7px;
+      color: #dce8ff;
+      padding: 8px 11px;
+      font-size: .85rem;
       outline: none;
       transition: border-color .15s;
-      background: #fafafa;
+      font-family: inherit;
     }
-    .field input:focus, .field select:focus { border-color: #4f46e5; background: #fff; }
+    .f-input::placeholder { color: #253550; }
+    .f-input:focus { border-color: var(--accent); }
+
+    .step-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    /* Gender toggle */
+    .gender-seg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      background: var(--sb);
+      border: 1.5px solid var(--sb-border);
+      border-radius: 7px;
+      padding: 3px;
+    }
+    .gender-seg button {
+      border: none;
+      border-radius: 5px;
+      padding: 7px 0;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: #3d5270;
+      transition: all .15s;
+      font-family: inherit;
+    }
+    .gender-seg button.active { background: var(--accent); color: #fff; }
 
     /* Checkboxes */
-    .section-list { display: flex; flex-direction: column; gap: 8px; }
-    .section-item {
+    .cb-list { display: flex; flex-direction: column; gap: 5px; }
+
+    .cb-item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 10px;
-      padding: 9px 11px;
+      padding: 8px 10px;
       border-radius: 7px;
       cursor: pointer;
       user-select: none;
-      border: 1.5px solid #e5e7eb;
-      transition: background .12s, border-color .12s;
+      border: 1.5px solid transparent;
+      background: var(--sb);
+      transition: all .13s;
     }
-    .section-item:hover { background: #f5f3ff; border-color: #c4b5fd; }
-    .section-item.checked { background: #f5f3ff; border-color: #7c3aed; }
+    .cb-item:hover { border-color: #253550; }
+    .cb-item input[type="checkbox"] { display: none; }
 
-    .section-item input[type="checkbox"] { display: none; }
-    .check-box {
-      width: 18px; height: 18px;
-      border: 2px solid #9ca3af;
+    .cb-box {
+      width: 16px; height: 16px;
+      min-width: 16px;
       border-radius: 4px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      transition: background .12s, border-color .12s;
-    }
-    .section-item.checked .check-box {
-      background: #7c3aed;
-      border-color: #7c3aed;
-    }
-    .check-box svg { display: none; }
-    .section-item.checked .check-box svg { display: block; }
-
-    .section-label { font-size: .85rem; font-weight: 500; color: #374151; }
-
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 7px;
-      font-size: .88rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity .15s;
-    }
-    .btn:hover { opacity: .88; }
-    .btn-primary { background: #4f46e5; color: #fff; }
-    .btn-secondary { background: #f3f4f6; color: #374151; margin-top: 8px; }
-    .btn-print { background: #059669; color: #fff; margin-top: 8px; }
-
-    /* ── Preview ── */
-    .preview-wrap {
+      border: 2px solid #253550;
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .preview-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #fff;
-      border-radius: 10px;
-      padding: 12px 18px;
-      box-shadow: 0 1px 4px rgba(0,0,0,.08);
-    }
-    .preview-toolbar span { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #6b7280; }
-    .tab-group { display: flex; gap: 4px; }
-    .tab {
-      padding: 5px 14px;
-      border-radius: 5px;
-      font-size: .82rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1.5px solid #e5e7eb;
-      background: #f9fafb;
-      color: #6b7280;
-      transition: all .12s;
-    }
-    .tab.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
-
-    /* Report document */
-    #report-doc {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,.08);
-      padding: 48px 56px;
-      min-height: 700px;
-    }
-
-    /* Editor */
-    #editor-wrap { display: none; flex-direction: column; gap: 14px; }
-    .section-editor {
-      background: #fff;
-      border-radius: 10px;
-      padding: 18px 20px;
-      box-shadow: 0 1px 4px rgba(0,0,0,.08);
-    }
-    .section-editor h3 {
-      font-size: .88rem;
-      font-weight: 700;
-      color: #4f46e5;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-    }
-    .section-editor textarea {
-      width: 100%;
-      min-height: 110px;
-      resize: vertical;
-      padding: 10px;
-      border: 1.5px solid #d1d5db;
-      border-radius: 6px;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      font-size: .88rem;
-      color: #111;
-      outline: none;
-      line-height: 1.6;
-      transition: border-color .15s;
-    }
-    .section-editor textarea:focus { border-color: #4f46e5; }
-
-    /* Report typography */
-    .report-header { border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 28px; }
-    .report-title {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin-bottom: 10px;
-    }
-    .report-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 18px;
-      font-size: .82rem;
-      color: #6b7280;
-    }
-    .report-meta span { display: flex; align-items: center; gap: 5px; }
-    .report-meta b { color: #374151; }
-
-    .report-section { margin-bottom: 28px; }
-    .report-section h2 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #4f46e5;
-      text-transform: uppercase;
-      letter-spacing: .6px;
-      margin-bottom: 8px;
-      padding-bottom: 4px;
-      border-bottom: 1.5px solid #ede9fe;
-    }
-    .report-section p {
-      font-size: .9rem;
-      line-height: 1.75;
-      color: #374151;
-      white-space: pre-wrap;
-    }
-    .report-section p.placeholder {
-      color: #9ca3af;
-      font-style: italic;
-    }
-
-    .empty-state {
-      display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 400px;
-      color: #9ca3af;
-      gap: 12px;
+      margin-top: 1px;
+      transition: all .13s;
     }
-    .empty-state svg { opacity: .35; }
-    .empty-state p { font-size: .9rem; }
+    .cb-tick { display: none; }
+    .cb-item.on .cb-box  { background: var(--accent); border-color: var(--accent); }
+    .cb-item.on .cb-tick { display: block; }
+    .cb-item.on { border-color: rgba(62,123,250,.22); background: rgba(62,123,250,.06); }
+    .cb-item.on .cb-text { color: #c5d8ff; }
 
+    .cb-text { font-size: .8rem; color: var(--sb-text); line-height: 1.45; }
+
+    /* Footer */
+    .sb-foot {
+      padding: 13px 14px;
+      border-top: 1px solid var(--sb-border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      font-size: .84rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 10px;
+      font-family: inherit;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn:hover  { opacity: .88; }
+    .btn:active { transform: scale(.98); }
+    .btn-print  { background: var(--accent); color: #fff; }
+    .btn-copy   { background: var(--sb-surface); color: var(--sb-text); border: 1px solid var(--sb-border); }
+    .btn-clear  { background: transparent; color: #3d5270; font-size: .75rem; padding: 5px; border: 1px solid transparent; }
+    .btn-clear:hover { color: #7a8fa8; border-color: var(--sb-border); }
+
+    /* ══════════════════════════════════════════
+       MAIN / PREVIEW
+    ══════════════════════════════════════════ */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 36px 28px;
+      overflow-y: auto;
+      min-width: 0;
+    }
+
+    .report-paper {
+      width: 100%;
+      max-width: 700px;
+      background: var(--paper);
+      border-radius: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.06), 0 8px 32px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+
+    /* Paper header */
+    .rp-head {
+      background: linear-gradient(135deg, #0b1120 0%, #151f32 100%);
+      padding: 26px 34px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .rp-head-title { color: #dce8ff; font-size: 1rem; font-weight: 700; letter-spacing: .2px; }
+    .rp-head-meta  { color: #3d5270; font-size: .75rem; margin-top: 4px; }
+    .rp-head-meta b { color: #7aabff; }
+    .rp-stamp {
+      background: rgba(62,123,250,.15);
+      border: 1px solid rgba(62,123,250,.3);
+      border-radius: 8px;
+      padding: 5px 12px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .rp-stamp .s1 { display: block; font-size: .62rem; font-weight: 700; letter-spacing: 1px; color: #3d5270; text-transform: uppercase; }
+    .rp-stamp .s2 { display: block; font-size: .8rem; font-weight: 800; color: #7aabff; margin-top: 1px; }
+
+    /* Paper body */
+    .rp-body { padding: 34px; display: flex; flex-direction: column; gap: 0; }
+
+    .rp-section { padding: 22px 0; }
+    .rp-section + .rp-section { border-top: 1px solid #eef2f7; }
+
+    .section-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .66rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 11px;
+    }
+    .pill-hgn { background: #f5f3ff; color: var(--hgn); border: 1px solid #ddd6fe; }
+    .pill-wat { background: #f0f9ff; color: var(--wat); border: 1px solid #bae6fd; }
+    .pill-ols { background: #f0fdf4; color: var(--ols); border: 1px solid #bbf7d0; }
+
+    .rp-para {
+      font-size: .91rem;
+      line-height: 1.9;
+      color: var(--text-mid);
+    }
+
+    mark {
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 2px;
+      padding: 0 2px;
+      font-weight: 500;
+    }
+
+    /* Print */
     @media print {
-      body { background: #fff; }
-      .layout { display: block; max-width: 100%; margin: 0; padding: 0; }
-      .sidebar, .preview-toolbar { display: none !important; }
-      #report-doc { box-shadow: none; border-radius: 0; padding: 20px; min-height: unset; }
-      #editor-wrap { display: none !important; }
+      .sidebar { display: none !important; }
+      .main { padding: 0; }
+      .report-paper { max-width: 100%; border-radius: 0; box-shadow: none; }
+      .rp-head { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .section-pill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      mark { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
 
-    @media (max-width: 860px) {
-      .layout { grid-template-columns: 1fr; }
+    @media (max-width: 780px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; min-width: unset; height: auto; position: static; }
+      .main { padding: 20px 14px; }
     }
   </style>
 </head>
 <body>
 
-<header>
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-    <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
-  </svg>
-  <h1>Report Writer</h1>
-</header>
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sb-head">
+    <div class="sb-badge">
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      SFST
+    </div>
+    <h1>Field Sobriety Test Report</h1>
+    <p>Fill in details and check observations to auto-generate</p>
+  </div>
 
-<div class="layout">
-  <!-- Sidebar -->
-  <aside class="sidebar">
+  <div class="sb-body">
 
-    <!-- Report Details -->
-    <div class="card">
-      <h2>Report Details</h2>
-      <div class="field">
-        <label for="rpt-title">Report Title</label>
-        <input id="rpt-title" type="text" placeholder="e.g. Q2 Status Report" />
+    <!-- Subject -->
+    <div class="fc">
+      <div class="fc-head">
+        <div class="fc-dot" style="background:#f59e0b"></div>
+        <h2>Subject</h2>
       </div>
-      <div class="field">
-        <label for="rpt-author">Prepared By</label>
-        <input id="rpt-author" type="text" placeholder="Full name" />
-      </div>
-      <div class="field">
-        <label for="rpt-recipient">Prepared For</label>
-        <input id="rpt-recipient" type="text" placeholder="Recipient / department" />
-      </div>
-      <div class="field">
-        <label for="rpt-date">Date</label>
-        <input id="rpt-date" type="date" />
-      </div>
-      <div class="field">
-        <label for="rpt-location">Location</label>
-        <input id="rpt-location" type="text" placeholder="City, site, or address" />
-      </div>
-      <div class="field">
-        <label for="rpt-ref">Reference / ID</label>
-        <input id="rpt-ref" type="text" placeholder="e.g. RPT-2026-001" />
+      <div class="fc-body">
+        <div>
+          <span class="f-label">Name</span>
+          <input class="f-input" id="s-name" type="text" placeholder="Subject's full name" oninput="render()" autocomplete="off" />
+        </div>
+        <div>
+          <span class="f-label">Gender</span>
+          <div class="gender-seg">
+            <button id="g-male"   class="active" onclick="setGender('male')">Male</button>
+            <button id="g-female"          onclick="setGender('female')">Female</button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Sections -->
-    <div class="card">
-      <h2>Report Sections</h2>
-      <div class="section-list" id="section-list">
-        <!-- populated by JS -->
+    <!-- HGN -->
+    <div class="fc">
+      <div class="fc-head">
+        <div class="fc-dot" style="background:#7c3aed"></div>
+        <h2>Horizontal Gaze Nystagmus (HGN)</h2>
+      </div>
+      <div class="fc-body">
+        <div class="cb-list">
+          <label class="cb-item" id="l-hgn1">
+            <input type="checkbox" id="hgn1" onchange="tick(this,'l-hgn1')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Lack of smooth pursuit</span>
+          </label>
+          <label class="cb-item" id="l-hgn2">
+            <input type="checkbox" id="hgn2" onchange="tick(this,'l-hgn2')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Distinct and sustained nystagmus at maximum deviation</span>
+          </label>
+          <label class="cb-item" id="l-hgn3">
+            <input type="checkbox" id="hgn3" onchange="tick(this,'l-hgn3')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Onset of nystagmus prior to 45 degrees in both eyes</span>
+          </label>
+          <label class="cb-item" id="l-hgn4">
+            <input type="checkbox" id="hgn4" onchange="tick(this,'l-hgn4')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Vertical nystagmus observed</span>
+          </label>
+        </div>
       </div>
     </div>
 
-    <!-- Actions -->
-    <div class="card">
-      <h2>Actions</h2>
-      <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
-      <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
-      <button class="btn btn-print" onclick="window.print()">Print / Save PDF</button>
-    </div>
-
-  </aside>
-
-  <!-- Preview / Editor -->
-  <main class="preview-wrap">
-    <div class="preview-toolbar">
-      <span>Output</span>
-      <div class="tab-group">
-        <button class="tab active" id="tab-preview" onclick="switchTab('preview')">Preview</button>
-        <button class="tab" id="tab-editor" onclick="switchTab('editor')">Edit Sections</button>
+    <!-- WAT -->
+    <div class="fc">
+      <div class="fc-head">
+        <div class="fc-dot" style="background:#0284c7"></div>
+        <h2>Walk-and-Turn (WAT)</h2>
+      </div>
+      <div class="fc-body">
+        <div class="cb-list">
+          <label class="cb-item" id="l-wat1">
+            <input type="checkbox" id="wat1" onchange="tick(this,'l-wat1')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Stepped out of starting position (instruction phase)</span>
+          </label>
+          <label class="cb-item" id="l-wat2">
+            <input type="checkbox" id="wat2" onchange="tick(this,'l-wat2')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Stopped while walking</span>
+          </label>
+          <label class="cb-item" id="l-wat3">
+            <input type="checkbox" id="wat3" onchange="tick(this,'l-wat3')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Missed heel-to-toe</span>
+          </label>
+          <label class="cb-item" id="l-wat4">
+            <input type="checkbox" id="wat4" onchange="tick(this,'l-wat4')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Stepped off the line</span>
+          </label>
+          <label class="cb-item" id="l-wat5">
+            <input type="checkbox" id="wat5" onchange="tick(this,'l-wat5')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Raised arms for balance</span>
+          </label>
+        </div>
+        <div class="step-row">
+          <div>
+            <span class="f-label">Steps — First 9</span>
+            <input class="f-input" id="st1" type="number" min="0" max="30" placeholder="—" oninput="render()" />
+          </div>
+          <div>
+            <span class="f-label">Steps — Second 9</span>
+            <input class="f-input" id="st2" type="number" min="0" max="30" placeholder="—" oninput="render()" />
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Live report doc -->
-    <div id="report-doc">
-      <div class="empty-state" id="empty-state">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-        </svg>
-        <p>Fill in the details and select sections, then click <b>Generate Report</b>.</p>
+    <!-- OLS -->
+    <div class="fc">
+      <div class="fc-head">
+        <div class="fc-dot" style="background:#059669"></div>
+        <h2>One Leg Stand (OLS)</h2>
       </div>
-      <div id="report-content" style="display:none"></div>
+      <div class="fc-body">
+        <div class="cb-list">
+          <label class="cb-item" id="l-ols1">
+            <input type="checkbox" id="ols1" onchange="tick(this,'l-ols1')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Swayed while balancing</span>
+          </label>
+          <label class="cb-item" id="l-ols2">
+            <input type="checkbox" id="ols2" onchange="tick(this,'l-ols2')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Used arms to balance</span>
+          </label>
+          <label class="cb-item" id="l-ols3">
+            <input type="checkbox" id="ols3" onchange="tick(this,'l-ols3')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Hopped to maintain balance</span>
+          </label>
+          <label class="cb-item" id="l-ols4">
+            <input type="checkbox" id="ols4" onchange="tick(this,'l-ols4')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Put foot down</span>
+          </label>
+        </div>
+      </div>
     </div>
 
-    <!-- Section editors -->
-    <div id="editor-wrap"></div>
-  </main>
-</div>
+  </div><!-- /sb-body -->
+
+  <div class="sb-foot">
+    <button class="btn btn-print" onclick="window.print()">
+      Print / Save as PDF
+    </button>
+    <button class="btn btn-copy" id="copy-btn" onclick="copyText()">
+      Copy Report Text
+    </button>
+    <button class="btn btn-clear" onclick="clearAll()">Clear all fields</button>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════════ -->
+<main class="main">
+  <div class="report-paper">
+
+    <div class="rp-head">
+      <div>
+        <div class="rp-head-title">Field Sobriety Test — Narrative Report</div>
+        <div class="rp-head-meta" id="rp-meta">Subject: <b>—</b></div>
+      </div>
+      <div class="rp-stamp">
+        <span class="s1">Type</span>
+        <span class="s2">SFST</span>
+      </div>
+    </div>
+
+    <div class="rp-body">
+
+      <div class="rp-section">
+        <div class="section-pill pill-hgn">
+          <svg width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="currentColor"/></svg>
+          HGN
+        </div>
+        <p class="rp-para" id="p-hgn"></p>
+      </div>
+
+      <div class="rp-section">
+        <div class="section-pill pill-wat">
+          <svg width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="currentColor"/></svg>
+          Walk-and-Turn
+        </div>
+        <p class="rp-para" id="p-wat"></p>
+      </div>
+
+      <div class="rp-section">
+        <div class="section-pill pill-ols">
+          <svg width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="currentColor"/></svg>
+          One Leg Stand
+        </div>
+        <p class="rp-para" id="p-ols"></p>
+      </div>
+
+    </div>
+  </div>
+</main>
 
 <script>
-  // ── Section definitions ──────────────────────────────────────────
-  const SECTIONS = [
-    {
-      id: 'executive-summary',
-      label: 'Executive Summary',
-      placeholder: 'A brief overview of the report\'s purpose, key findings, and conclusions. Keep this to 2–3 sentences that capture the most important points.',
-      default: ''
-    },
-    {
-      id: 'background',
-      label: 'Background / Context',
-      placeholder: 'Describe the background, history, or context that led to this report. Include any relevant prior events, decisions, or circumstances.',
-      default: ''
-    },
-    {
-      id: 'scope',
-      label: 'Scope & Objectives',
-      placeholder: 'Define the scope of this report. What is included and excluded? What are the primary objectives or questions being addressed?',
-      default: ''
-    },
-    {
-      id: 'findings',
-      label: 'Findings / Observations',
-      placeholder: 'Detail the key findings, data, or observations gathered. Use clear, factual language and organize by theme or category where possible.',
-      default: ''
-    },
-    {
-      id: 'analysis',
-      label: 'Analysis',
-      placeholder: 'Interpret the findings. What do the data and observations mean? Identify patterns, trends, risks, or opportunities.',
-      default: ''
-    },
-    {
-      id: 'recommendations',
-      label: 'Recommendations',
-      placeholder: 'List actionable recommendations based on your analysis. Be specific about who should act, what they should do, and by when.',
-      default: ''
-    },
-    {
-      id: 'action-items',
-      label: 'Action Items',
-      placeholder: 'Bullet the specific next steps:\n• [Action] — [Owner] — [Due date]\n• [Action] — [Owner] — [Due date]',
-      default: ''
-    },
-    {
-      id: 'conclusion',
-      label: 'Conclusion',
-      placeholder: 'Summarise the report\'s main points and reinforce the most important takeaways. Close with a forward-looking statement.',
-      default: ''
-    },
-    {
-      id: 'appendix',
-      label: 'Appendix / Notes',
-      placeholder: 'Any supplementary material, references, or notes that support the report but don\'t belong in the main body.',
-      default: ''
-    },
-  ];
-
   // ── State ────────────────────────────────────────────────────────
-  const state = {
-    checked: new Set(),
-    content: {},   // sectionId -> user-edited text
-    generated: false,
+  let gender = 'male';
+
+  const P = {
+    male:   { he: 'he',  him: 'him', his: 'his', she: 'he',  her: 'him' },
+    female: { he: 'she', him: 'her', his: 'her', she: 'she', her: 'her' }
   };
 
-  // Set today's date default
-  document.getElementById('rpt-date').valueAsDate = new Date();
+  // ── Helpers ──────────────────────────────────────────────────────
+  function $id(id) { return document.getElementById(id); }
+  function on(id)  { return $id(id).checked; }
+  function v(id)   { return $id(id).value.trim(); }
+  function esc(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  // ── Build checkbox list ──────────────────────────────────────────
-  function buildSectionList() {
-    const list = document.getElementById('section-list');
-    list.innerHTML = '';
-    SECTIONS.forEach(s => {
-      const item = document.createElement('label');
-      item.className = 'section-item' + (state.checked.has(s.id) ? ' checked' : '');
-      item.innerHTML = `
-        <input type="checkbox" ${state.checked.has(s.id) ? 'checked' : ''} />
-        <span class="check-box">
-          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="1.5 6 4.5 9 10.5 3"/>
-          </svg>
-        </span>
-        <span class="section-label">${s.label}</span>`;
-      item.addEventListener('change', () => toggleSection(s.id, item));
-      list.appendChild(item);
-    });
+  function cap(s) {
+    return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
   }
 
-  function toggleSection(id, el) {
-    if (state.checked.has(id)) {
-      state.checked.delete(id);
-      el.classList.remove('checked');
-    } else {
-      state.checked.add(id);
-      el.classList.add('checked');
+  // Oxford-comma list builder
+  function list(items) {
+    if (!items.length)  return '';
+    if (items.length === 1) return items[0];
+    if (items.length === 2) return items[0] + ' and ' + items[1];
+    return items.slice(0, -1).join(', ') + ', and ' + items[items.length - 1];
+  }
+
+  // Wrap name in <mark> for the preview
+  function nm(raw) {
+    return raw
+      ? `<mark>${esc(raw)}</mark>`
+      : '<mark>[Subject Name]</mark>';
+  }
+
+  // ── UI helpers ───────────────────────────────────────────────────
+  function tick(cb, lblId) {
+    $id(lblId).classList.toggle('on', cb.checked);
+    render();
+  }
+
+  function setGender(g) {
+    gender = g;
+    $id('g-male').classList.toggle('active',   g === 'male');
+    $id('g-female').classList.toggle('active', g === 'female');
+    render();
+  }
+
+  // ── Render ───────────────────────────────────────────────────────
+  function render() {
+    const raw  = v('s-name');
+    const name = raw || 'the subject';
+    const p    = P[gender];
+
+    // Header meta
+    $id('rp-meta').innerHTML = `Subject: <b>${esc(raw || '—')}</b>`;
+
+    // ── HGN ──
+    const hgnObs = [];
+    if (on('hgn1')) hgnObs.push('lack of smooth pursuit');
+    if (on('hgn2')) hgnObs.push('distinct and sustained nystagmus at maximum deviation');
+    if (on('hgn3')) hgnObs.push('onset of nystagmus prior to 45 degrees in both eyes');
+
+    let hgn = `The first test I administered was Horizontal Gaze Nystagmus (HGN). `
+            + `I explained the test to ${nm(raw)}, asking ${p.him} if ${p.he} understood the instructions.`;
+    if (hgnObs.length) {
+      hgn += ` During this test, I observed ${list(hgnObs)}.`;
     }
-    if (state.generated) generateReport();
-  }
-
-  // ── Generate report preview ──────────────────────────────────────
-  function generateReport() {
-    const title     = document.getElementById('rpt-title').value.trim()     || 'Untitled Report';
-    const author    = document.getElementById('rpt-author').value.trim()    || '—';
-    const recipient = document.getElementById('rpt-recipient').value.trim() || '—';
-    const dateRaw   = document.getElementById('rpt-date').value;
-    const location  = document.getElementById('rpt-location').value.trim()  || '—';
-    const ref       = document.getElementById('rpt-ref').value.trim()       || '—';
-
-    const dateStr = dateRaw
-      ? new Date(dateRaw + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-      : '—';
-
-    document.getElementById('empty-state').style.display = 'none';
-    const content = document.getElementById('report-content');
-    content.style.display = 'block';
-
-    let html = `
-      <div class="report-header">
-        <div class="report-title">${escHtml(title)}</div>
-        <div class="report-meta">
-          <span><b>Prepared By:</b> ${escHtml(author)}</span>
-          <span><b>Prepared For:</b> ${escHtml(recipient)}</span>
-          <span><b>Date:</b> ${escHtml(dateStr)}</span>
-          <span><b>Location:</b> ${escHtml(location)}</span>
-          <span><b>Ref:</b> ${escHtml(ref)}</span>
-        </div>
-      </div>`;
-
-    const activeSections = SECTIONS.filter(s => state.checked.has(s.id));
-    if (activeSections.length === 0) {
-      html += `<div class="empty-state" style="height:300px"><p>No sections selected. Check at least one section on the left.</p></div>`;
-    } else {
-      activeSections.forEach(s => {
-        const text = (state.content[s.id] || '').trim();
-        const isEmpty = text === '';
-        html += `
-          <div class="report-section">
-            <h2>${escHtml(s.label)}</h2>
-            <p class="${isEmpty ? 'placeholder' : ''}">${escHtml(isEmpty ? s.placeholder : text)}</p>
-          </div>`;
-      });
+    if (on('hgn4')) {
+      hgn += ` I additionally observed vertical nystagmus.`;
     }
 
-    content.innerHTML = html;
-    state.generated = true;
-    buildEditorPanels();
+    // ── WAT ──
+    const s1 = v('st1') || '___';
+    const s2 = v('st2') || '___';
+
+    let wat = `The second test I administered was Walk-and-Turn. `
+            + `I explained and demonstrated the test to ${nm(raw)}.`;
+    if (on('wat1')) {
+      wat += ` During the instruction phase, ${nm(raw)} stepped out of the starting position.`;
+    }
+    wat += ` After ${nm(raw)} stated ${p.he} did not have any questions, I told ${p.him} to begin.`;
+
+    const watBeh = [];
+    if (on('wat2')) watBeh.push('stopped while walking');
+    if (on('wat3')) watBeh.push('missed heel-to-toe');
+    if (on('wat4')) watBeh.push('stepped off the line');
+    if (on('wat5')) watBeh.push('raised their arms');
+
+    if (watBeh.length) {
+      wat += ` ${nm(raw)} ${list(watBeh)}.`;
+    }
+    wat += ` ${nm(raw)} took ${esc(s1)} steps on the first nine and ${esc(s2)} steps on the second nine.`;
+
+    // ── OLS ──
+    const olsBeh = [];
+    if (on('ols1')) olsBeh.push('swayed while balancing');
+    if (on('ols2')) olsBeh.push(`used ${p.his} arms to balance`);
+    if (on('ols3')) olsBeh.push('hopped');
+    if (on('ols4')) olsBeh.push(`put ${p.his} foot down`);
+
+    let ols = `The final test I administered was One Leg Stand. `
+            + `I explained and demonstrated the test to ${nm(raw)}.`;
+    if (olsBeh.length) {
+      ols += ` During this test, ${nm(raw)} ${list(olsBeh)}.`;
+    }
+
+    $id('p-hgn').innerHTML = hgn;
+    $id('p-wat').innerHTML = wat;
+    $id('p-ols').innerHTML = ols;
   }
 
-  // ── Editor panels ────────────────────────────────────────────────
-  function buildEditorPanels() {
-    const wrap = document.getElementById('editor-wrap');
-    const activeSections = SECTIONS.filter(s => state.checked.has(s.id));
+  // ── Copy plain text ──────────────────────────────────────────────
+  function copyText() {
+    // Build plain-text version (strip HTML tags)
+    function plain(html) {
+      const d = document.createElement('div');
+      d.innerHTML = html;
+      return d.textContent;
+    }
+    const text = [
+      plain($id('p-hgn').innerHTML),
+      '',
+      plain($id('p-wat').innerHTML),
+      '',
+      plain($id('p-ols').innerHTML)
+    ].join('\n');
 
-    wrap.innerHTML = '';
-    activeSections.forEach(s => {
-      const div = document.createElement('div');
-      div.className = 'section-editor';
-      div.innerHTML = `<h3>${escHtml(s.label)}</h3>
-        <textarea placeholder="${escHtml(s.placeholder)}" data-id="${s.id}">${escHtml(state.content[s.id] || '')}</textarea>`;
-      div.querySelector('textarea').addEventListener('input', e => {
-        state.content[s.id] = e.target.value;
-        generateReport();
-      });
-      wrap.appendChild(div);
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = $id('copy-btn');
+      const prev = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = prev; }, 1800);
     });
-  }
-
-  // ── Tab switching ────────────────────────────────────────────────
-  function switchTab(tab) {
-    document.getElementById('tab-preview').classList.toggle('active', tab === 'preview');
-    document.getElementById('tab-editor').classList.toggle('active', tab === 'editor');
-    document.getElementById('report-doc').style.display  = tab === 'preview' ? 'block' : 'none';
-    document.getElementById('editor-wrap').style.display = tab === 'editor'  ? 'flex'  : 'none';
   }
 
   // ── Clear ────────────────────────────────────────────────────────
   function clearAll() {
-    if (!confirm('Clear all inputs and sections?')) return;
-    ['rpt-title','rpt-author','rpt-recipient','rpt-location','rpt-ref'].forEach(id => {
-      document.getElementById(id).value = '';
+    if (!confirm('Clear all fields and checkboxes?')) return;
+    $id('s-name').value = '';
+    $id('st1').value = '';
+    $id('st2').value = '';
+    ['hgn1','hgn2','hgn3','hgn4',
+     'wat1','wat2','wat3','wat4','wat5',
+     'ols1','ols2','ols3','ols4'].forEach(id => {
+      $id(id).checked = false;
+      $id('l-' + id).classList.remove('on');
     });
-    document.getElementById('rpt-date').valueAsDate = new Date();
-    state.checked.clear();
-    state.content = {};
-    state.generated = false;
-    buildSectionList();
-    document.getElementById('empty-state').style.display = 'flex';
-    document.getElementById('report-content').style.display = 'none';
-    document.getElementById('report-content').innerHTML = '';
-    document.getElementById('editor-wrap').innerHTML = '';
-    switchTab('preview');
-  }
-
-  // ── Helpers ──────────────────────────────────────────────────────
-  function escHtml(str) {
-    return String(str)
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;');
+    setGender('male');
+    render();
   }
 
   // ── Init ─────────────────────────────────────────────────────────
-  buildSectionList();
+  render();
 </script>
 </body>
 </html>
