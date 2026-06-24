@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Writer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1a1a2e;
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    header h1 { font-size: 1.3rem; font-weight: 600; letter-spacing: .3px; }
+    header svg { opacity: .8; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      max-width: 1300px;
+      margin: 28px auto;
+      padding: 0 20px;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .card h2 {
+      font-size: .8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: #6b7280;
+      margin-bottom: 14px;
+    }
+
+    .field { margin-bottom: 12px; }
+    .field label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 4px;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 6px;
+      font-size: .88rem;
+      color: #111;
+      outline: none;
+      transition: border-color .15s;
+      background: #fafafa;
+    }
+    .field input:focus, .field select:focus { border-color: #4f46e5; background: #fff; }
+
+    /* Checkboxes */
+    .section-list { display: flex; flex-direction: column; gap: 8px; }
+    .section-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 11px;
+      border-radius: 7px;
+      cursor: pointer;
+      user-select: none;
+      border: 1.5px solid #e5e7eb;
+      transition: background .12s, border-color .12s;
+    }
+    .section-item:hover { background: #f5f3ff; border-color: #c4b5fd; }
+    .section-item.checked { background: #f5f3ff; border-color: #7c3aed; }
+
+    .section-item input[type="checkbox"] { display: none; }
+    .check-box {
+      width: 18px; height: 18px;
+      border: 2px solid #9ca3af;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background .12s, border-color .12s;
+    }
+    .section-item.checked .check-box {
+      background: #7c3aed;
+      border-color: #7c3aed;
+    }
+    .check-box svg { display: none; }
+    .section-item.checked .check-box svg { display: block; }
+
+    .section-label { font-size: .85rem; font-weight: 500; color: #374151; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 7px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: .88; }
+    .btn-primary { background: #4f46e5; color: #fff; }
+    .btn-secondary { background: #f3f4f6; color: #374151; margin-top: 8px; }
+    .btn-print { background: #059669; color: #fff; margin-top: 8px; }
+
+    /* ── Preview ── */
+    .preview-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .preview-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .preview-toolbar span { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #6b7280; }
+    .tab-group { display: flex; gap: 4px; }
+    .tab {
+      padding: 5px 14px;
+      border-radius: 5px;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid #e5e7eb;
+      background: #f9fafb;
+      color: #6b7280;
+      transition: all .12s;
+    }
+    .tab.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+
+    /* Report document */
+    #report-doc {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      padding: 48px 56px;
+      min-height: 700px;
+    }
+
+    /* Editor */
+    #editor-wrap { display: none; flex-direction: column; gap: 14px; }
+    .section-editor {
+      background: #fff;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .section-editor h3 {
+      font-size: .88rem;
+      font-weight: 700;
+      color: #4f46e5;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .section-editor textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      padding: 10px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 6px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: .88rem;
+      color: #111;
+      outline: none;
+      line-height: 1.6;
+      transition: border-color .15s;
+    }
+    .section-editor textarea:focus { border-color: #4f46e5; }
+
+    /* Report typography */
+    .report-header { border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 28px; }
+    .report-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 10px;
+    }
+    .report-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      font-size: .82rem;
+      color: #6b7280;
+    }
+    .report-meta span { display: flex; align-items: center; gap: 5px; }
+    .report-meta b { color: #374151; }
+
+    .report-section { margin-bottom: 28px; }
+    .report-section h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #4f46e5;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1.5px solid #ede9fe;
+    }
+    .report-section p {
+      font-size: .9rem;
+      line-height: 1.75;
+      color: #374151;
+      white-space: pre-wrap;
+    }
+    .report-section p.placeholder {
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+      color: #9ca3af;
+      gap: 12px;
+    }
+    .empty-state svg { opacity: .35; }
+    .empty-state p { font-size: .9rem; }
+
+    @media print {
+      body { background: #fff; }
+      .layout { display: block; max-width: 100%; margin: 0; padding: 0; }
+      .sidebar, .preview-toolbar { display: none !important; }
+      #report-doc { box-shadow: none; border-radius: 0; padding: 20px; min-height: unset; }
+      #editor-wrap { display: none !important; }
+    }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+    <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+  </svg>
+  <h1>Report Writer</h1>
+</header>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+
+    <!-- Report Details -->
+    <div class="card">
+      <h2>Report Details</h2>
+      <div class="field">
+        <label for="rpt-title">Report Title</label>
+        <input id="rpt-title" type="text" placeholder="e.g. Q2 Status Report" />
+      </div>
+      <div class="field">
+        <label for="rpt-author">Prepared By</label>
+        <input id="rpt-author" type="text" placeholder="Full name" />
+      </div>
+      <div class="field">
+        <label for="rpt-recipient">Prepared For</label>
+        <input id="rpt-recipient" type="text" placeholder="Recipient / department" />
+      </div>
+      <div class="field">
+        <label for="rpt-date">Date</label>
+        <input id="rpt-date" type="date" />
+      </div>
+      <div class="field">
+        <label for="rpt-location">Location</label>
+        <input id="rpt-location" type="text" placeholder="City, site, or address" />
+      </div>
+      <div class="field">
+        <label for="rpt-ref">Reference / ID</label>
+        <input id="rpt-ref" type="text" placeholder="e.g. RPT-2026-001" />
+      </div>
+    </div>
+
+    <!-- Sections -->
+    <div class="card">
+      <h2>Report Sections</h2>
+      <div class="section-list" id="section-list">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="card">
+      <h2>Actions</h2>
+      <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+      <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
+      <button class="btn btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+  </aside>
+
+  <!-- Preview / Editor -->
+  <main class="preview-wrap">
+    <div class="preview-toolbar">
+      <span>Output</span>
+      <div class="tab-group">
+        <button class="tab active" id="tab-preview" onclick="switchTab('preview')">Preview</button>
+        <button class="tab" id="tab-editor" onclick="switchTab('editor')">Edit Sections</button>
+      </div>
+    </div>
+
+    <!-- Live report doc -->
+    <div id="report-doc">
+      <div class="empty-state" id="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+        <p>Fill in the details and select sections, then click <b>Generate Report</b>.</p>
+      </div>
+      <div id="report-content" style="display:none"></div>
+    </div>
+
+    <!-- Section editors -->
+    <div id="editor-wrap"></div>
+  </main>
+</div>
+
+<script>
+  // ── Section definitions ──────────────────────────────────────────
+  const SECTIONS = [
+    {
+      id: 'executive-summary',
+      label: 'Executive Summary',
+      placeholder: 'A brief overview of the report\'s purpose, key findings, and conclusions. Keep this to 2–3 sentences that capture the most important points.',
+      default: ''
+    },
+    {
+      id: 'background',
+      label: 'Background / Context',
+      placeholder: 'Describe the background, history, or context that led to this report. Include any relevant prior events, decisions, or circumstances.',
+      default: ''
+    },
+    {
+      id: 'scope',
+      label: 'Scope & Objectives',
+      placeholder: 'Define the scope of this report. What is included and excluded? What are the primary objectives or questions being addressed?',
+      default: ''
+    },
+    {
+      id: 'findings',
+      label: 'Findings / Observations',
+      placeholder: 'Detail the key findings, data, or observations gathered. Use clear, factual language and organize by theme or category where possible.',
+      default: ''
+    },
+    {
+      id: 'analysis',
+      label: 'Analysis',
+      placeholder: 'Interpret the findings. What do the data and observations mean? Identify patterns, trends, risks, or opportunities.',
+      default: ''
+    },
+    {
+      id: 'recommendations',
+      label: 'Recommendations',
+      placeholder: 'List actionable recommendations based on your analysis. Be specific about who should act, what they should do, and by when.',
+      default: ''
+    },
+    {
+      id: 'action-items',
+      label: 'Action Items',
+      placeholder: 'Bullet the specific next steps:\n• [Action] — [Owner] — [Due date]\n• [Action] — [Owner] — [Due date]',
+      default: ''
+    },
+    {
+      id: 'conclusion',
+      label: 'Conclusion',
+      placeholder: 'Summarise the report\'s main points and reinforce the most important takeaways. Close with a forward-looking statement.',
+      default: ''
+    },
+    {
+      id: 'appendix',
+      label: 'Appendix / Notes',
+      placeholder: 'Any supplementary material, references, or notes that support the report but don\'t belong in the main body.',
+      default: ''
+    },
+  ];
+
+  // ── State ────────────────────────────────────────────────────────
+  const state = {
+    checked: new Set(),
+    content: {},   // sectionId -> user-edited text
+    generated: false,
+  };
+
+  // Set today's date default
+  document.getElementById('rpt-date').valueAsDate = new Date();
+
+  // ── Build checkbox list ──────────────────────────────────────────
+  function buildSectionList() {
+    const list = document.getElementById('section-list');
+    list.innerHTML = '';
+    SECTIONS.forEach(s => {
+      const item = document.createElement('label');
+      item.className = 'section-item' + (state.checked.has(s.id) ? ' checked' : '');
+      item.innerHTML = `
+        <input type="checkbox" ${state.checked.has(s.id) ? 'checked' : ''} />
+        <span class="check-box">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1.5 6 4.5 9 10.5 3"/>
+          </svg>
+        </span>
+        <span class="section-label">${s.label}</span>`;
+      item.addEventListener('change', () => toggleSection(s.id, item));
+      list.appendChild(item);
+    });
+  }
+
+  function toggleSection(id, el) {
+    if (state.checked.has(id)) {
+      state.checked.delete(id);
+      el.classList.remove('checked');
+    } else {
+      state.checked.add(id);
+      el.classList.add('checked');
+    }
+    if (state.generated) generateReport();
+  }
+
+  // ── Generate report preview ──────────────────────────────────────
+  function generateReport() {
+    const title     = document.getElementById('rpt-title').value.trim()     || 'Untitled Report';
+    const author    = document.getElementById('rpt-author').value.trim()    || '—';
+    const recipient = document.getElementById('rpt-recipient').value.trim() || '—';
+    const dateRaw   = document.getElementById('rpt-date').value;
+    const location  = document.getElementById('rpt-location').value.trim()  || '—';
+    const ref       = document.getElementById('rpt-ref').value.trim()       || '—';
+
+    const dateStr = dateRaw
+      ? new Date(dateRaw + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      : '—';
+
+    document.getElementById('empty-state').style.display = 'none';
+    const content = document.getElementById('report-content');
+    content.style.display = 'block';
+
+    let html = `
+      <div class="report-header">
+        <div class="report-title">${escHtml(title)}</div>
+        <div class="report-meta">
+          <span><b>Prepared By:</b> ${escHtml(author)}</span>
+          <span><b>Prepared For:</b> ${escHtml(recipient)}</span>
+          <span><b>Date:</b> ${escHtml(dateStr)}</span>
+          <span><b>Location:</b> ${escHtml(location)}</span>
+          <span><b>Ref:</b> ${escHtml(ref)}</span>
+        </div>
+      </div>`;
+
+    const activeSections = SECTIONS.filter(s => state.checked.has(s.id));
+    if (activeSections.length === 0) {
+      html += `<div class="empty-state" style="height:300px"><p>No sections selected. Check at least one section on the left.</p></div>`;
+    } else {
+      activeSections.forEach(s => {
+        const text = (state.content[s.id] || '').trim();
+        const isEmpty = text === '';
+        html += `
+          <div class="report-section">
+            <h2>${escHtml(s.label)}</h2>
+            <p class="${isEmpty ? 'placeholder' : ''}">${escHtml(isEmpty ? s.placeholder : text)}</p>
+          </div>`;
+      });
+    }
+
+    content.innerHTML = html;
+    state.generated = true;
+    buildEditorPanels();
+  }
+
+  // ── Editor panels ────────────────────────────────────────────────
+  function buildEditorPanels() {
+    const wrap = document.getElementById('editor-wrap');
+    const activeSections = SECTIONS.filter(s => state.checked.has(s.id));
+
+    wrap.innerHTML = '';
+    activeSections.forEach(s => {
+      const div = document.createElement('div');
+      div.className = 'section-editor';
+      div.innerHTML = `<h3>${escHtml(s.label)}</h3>
+        <textarea placeholder="${escHtml(s.placeholder)}" data-id="${s.id}">${escHtml(state.content[s.id] || '')}</textarea>`;
+      div.querySelector('textarea').addEventListener('input', e => {
+        state.content[s.id] = e.target.value;
+        generateReport();
+      });
+      wrap.appendChild(div);
+    });
+  }
+
+  // ── Tab switching ────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.getElementById('tab-preview').classList.toggle('active', tab === 'preview');
+    document.getElementById('tab-editor').classList.toggle('active', tab === 'editor');
+    document.getElementById('report-doc').style.display  = tab === 'preview' ? 'block' : 'none';
+    document.getElementById('editor-wrap').style.display = tab === 'editor'  ? 'flex'  : 'none';
+  }
+
+  // ── Clear ────────────────────────────────────────────────────────
+  function clearAll() {
+    if (!confirm('Clear all inputs and sections?')) return;
+    ['rpt-title','rpt-author','rpt-recipient','rpt-location','rpt-ref'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('rpt-date').valueAsDate = new Date();
+    state.checked.clear();
+    state.content = {};
+    state.generated = false;
+    buildSectionList();
+    document.getElementById('empty-state').style.display = 'flex';
+    document.getElementById('report-content').style.display = 'none';
+    document.getElementById('report-content').innerHTML = '';
+    document.getElementById('editor-wrap').innerHTML = '';
+    switchTab('preview');
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────
+  buildSectionList();
+</script>
+</body>
+</html>
