@@ -299,7 +299,40 @@
     }
     .pill-hgn { background: #f5f3ff; color: var(--hgn); border: 1px solid #ddd6fe; }
     .pill-wat { background: #f0f9ff; color: var(--wat); border: 1px solid #bae6fd; }
-    .pill-ols { background: #f0fdf4; color: var(--ols); border: 1px solid #bbf7d0; }
+    .pill-ols   { background: #f0fdf4; color: var(--ols); border: 1px solid #bbf7d0; }
+    .pill-intox { background: #fffbeb; color: #b45309;   border: 1px solid #fde68a; }
+    .pill-blood { background: #fff1f2; color: #be123c;   border: 1px solid #fecdd3; }
+
+    .part-divider {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--sb-text-dim); font-size: .67rem; font-weight: 700;
+      letter-spacing: .9px; text-transform: uppercase; padding: 0 2px;
+    }
+    .part-divider::before, .part-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--sb-border);
+    }
+
+    .f-note { font-size: .67rem; color: #2d4060; margin-top: 4px; display: block; }
+
+    .subloc-item {
+      display: flex; align-items: flex-start; gap: 9px;
+      padding: 7px 10px; border-radius: 6px; cursor: pointer;
+      user-select: none; background: var(--sb);
+      border: 1.5px solid transparent; transition: all .12s;
+    }
+    .subloc-item:hover { border-color: #253550; }
+    .subloc-item input[type="radio"] { display: none; }
+    .rb {
+      width: 15px; height: 15px; min-width: 15px; border-radius: 50%;
+      border: 2px solid #253550; margin-top: 1.5px; flex-shrink: 0;
+      transition: all .12s;
+    }
+    .subloc-item.sel .rb { border-color: var(--accent); background: var(--accent); box-shadow: inset 0 0 0 4px var(--sb); }
+    .subloc-item.sel { border-color: rgba(62,123,250,.22); background: rgba(62,123,250,.06); }
+    .subloc-item.sel .sub-text { color: #c5d8ff; }
+    .sub-text { font-size: .78rem; color: var(--sb-text); line-height: 1.4; }
+
+    .rp-blood-para { margin-top: 16px; }
 
     .rp-para {
       font-size: .91rem;
@@ -479,6 +512,123 @@
       </div>
     </div>
 
+    <!-- ── Part 2 divider ── -->
+    <div class="part-divider"><span>Part 2 — Intoxilyzer</span></div>
+
+    <!-- INTOX -->
+    <div class="fc">
+      <div class="fc-head">
+        <div class="fc-dot" style="background:#d97706"></div>
+        <h2>Intoxilyzer (INTOX)</h2>
+      </div>
+      <div class="fc-body">
+
+        <!-- Intox Location -->
+        <div>
+          <span class="f-label">Transported to (Parish)</span>
+          <div class="gender-seg">
+            <button id="ip-ebr" onclick="setIntoxParish('ebr')">East Baton Rouge</button>
+            <button id="ip-asc" onclick="setIntoxParish('ascension')">Ascension</button>
+          </div>
+        </div>
+        <div id="ip-ebr-locs" style="display:none; flex-direction:column; gap:4px">
+          <label class="subloc-item"><input type="radio" name="intox-loc" value="the Department of Public Safety Administration Building" onchange="syncSubLocs('intox-loc')" /><span class="rb"></span><span class="sub-text">Dept. of Public Safety Administration Building</span></label>
+          <label class="subloc-item"><input type="radio" name="intox-loc" value="LSU Police Department" onchange="syncSubLocs('intox-loc')" /><span class="rb"></span><span class="sub-text">LSU Police Department</span></label>
+          <label class="subloc-item"><input type="radio" name="intox-loc" value="LSP Troop A" onchange="syncSubLocs('intox-loc')" /><span class="rb"></span><span class="sub-text">LSP Troop A</span></label>
+          <label class="subloc-item"><input type="radio" name="intox-loc" value="EBRSO Central Substation" onchange="syncSubLocs('intox-loc')" /><span class="rb"></span><span class="sub-text">EBRSO Central Substation</span></label>
+          <label class="subloc-item"><input type="radio" name="intox-loc" value="Baton Rouge Police Department Headquarters" onchange="syncSubLocs('intox-loc')" /><span class="rb"></span><span class="sub-text">Baton Rouge Police Department Headquarters</span></label>
+        </div>
+        <div id="ip-asc-locs" style="display:none; flex-direction:column; gap:4px">
+          <label class="subloc-item"><input type="radio" name="intox-loc" value="Ascension Parish Sheriff's Office District 2" onchange="syncSubLocs('intox-loc')" /><span class="rb"></span><span class="sub-text">Ascension Parish Sheriff's Office District 2</span></label>
+          <label class="subloc-item"><input type="radio" name="intox-loc" value="Gonzales Police Department" onchange="syncSubLocs('intox-loc')" /><span class="rb"></span><span class="sub-text">Gonzales Police Department</span></label>
+          <label class="subloc-item"><input type="radio" name="intox-loc" value="Ascension Parish Jail" onchange="syncSubLocs('intox-loc')" /><span class="rb"></span><span class="sub-text">Ascension Parish Jail</span></label>
+        </div>
+
+        <!-- Rights Hours -->
+        <div>
+          <span class="f-label">Time Rights Form Read</span>
+          <input class="f-input" id="rights-hours" type="text" maxlength="4" placeholder="e.g. 2145" oninput="render()" autocomplete="off" />
+          <span class="f-note">24-hr format — printed as "xxxx hours"</span>
+        </div>
+
+        <!-- Rights Sign -->
+        <div>
+          <span class="f-label">Rights Form Signed</span>
+          <div class="gender-seg">
+            <button id="rs-yes" onclick="setRightsSign('yes')">Yes</button>
+            <button id="rs-no"  onclick="setRightsSign('no')">No</button>
+          </div>
+        </div>
+
+        <!-- Blow or No -->
+        <div>
+          <span class="f-label">Subject Provided Breath Sample</span>
+          <div class="gender-seg">
+            <button id="blow-yes" onclick="setBlow('yes')">Yes</button>
+            <button id="blow-no"  onclick="setBlow('no')">No</button>
+          </div>
+        </div>
+
+        <!-- Blow = Yes fields -->
+        <div id="blow-yes-fields" style="display:none; flex-direction:column; gap:9px">
+          <div>
+            <span class="f-label">BAC Result</span>
+            <input class="f-input" id="bac" type="text" placeholder="e.g. 0.123" oninput="render()" autocomplete="off" />
+            <span class="f-note">Format: x.xxx</span>
+          </div>
+          <div>
+            <span class="f-label">Time of Breath Sample</span>
+            <input class="f-input" id="intox-time" type="text" maxlength="4" placeholder="e.g. 2245" oninput="render()" autocomplete="off" />
+            <span class="f-note">24-hr format — printed as "xxxx hours"</span>
+          </div>
+        </div>
+
+        <!-- Blow = No fields -->
+        <div id="blow-no-fields" style="display:none; flex-direction:column; gap:9px">
+          <div>
+            <span class="f-label">Judge Who Signed Warrant</span>
+            <input class="f-input" id="judge-name" type="text" placeholder="Include title" oninput="render()" autocomplete="off" />
+            <span class="f-note">Include full title (e.g. "Judge Jane Doe")</span>
+          </div>
+          <div>
+            <span class="f-label">Blood Draw Location (Parish)</span>
+            <div class="gender-seg">
+              <button id="bp-ebr" onclick="setBloodParish('ebr')">East Baton Rouge</button>
+              <button id="bp-asc" onclick="setBloodParish('ascension')">Ascension</button>
+            </div>
+          </div>
+          <div id="bp-ebr-locs" style="display:none; flex-direction:column; gap:4px">
+            <label class="subloc-item"><input type="radio" name="blood-loc" value="Our Lady of the Lake North Hospital" onchange="syncSubLocs('blood-loc')" /><span class="rb"></span><span class="sub-text">Our Lady of the Lake North Hospital</span></label>
+            <label class="subloc-item"><input type="radio" name="blood-loc" value="Our Lady of the Lake Regional Medical Center" onchange="syncSubLocs('blood-loc')" /><span class="rb"></span><span class="sub-text">Our Lady of the Lake Regional Medical Center</span></label>
+            <label class="subloc-item"><input type="radio" name="blood-loc" value="Baton Rouge General Midcity Hospital" onchange="syncSubLocs('blood-loc')" /><span class="rb"></span><span class="sub-text">Baton Rouge General Midcity Hospital</span></label>
+            <label class="subloc-item"><input type="radio" name="blood-loc" value="Baton Rouge General Hospital" onchange="syncSubLocs('blood-loc')" /><span class="rb"></span><span class="sub-text">Baton Rouge General Hospital</span></label>
+            <label class="subloc-item"><input type="radio" name="blood-loc" value="Ochsner Hospital" onchange="syncSubLocs('blood-loc')" /><span class="rb"></span><span class="sub-text">Ochsner Hospital</span></label>
+          </div>
+          <div id="bp-asc-locs" style="display:none; flex-direction:column; gap:4px">
+            <label class="subloc-item"><input type="radio" name="blood-loc" value="Baton Rouge General Ascension Hospital" onchange="syncSubLocs('blood-loc')" /><span class="rb"></span><span class="sub-text">Baton Rouge General Ascension Hospital</span></label>
+            <label class="subloc-item"><input type="radio" name="blood-loc" value="Our Lady of the Lake Ascension Hospital" onchange="syncSubLocs('blood-loc')" /><span class="rb"></span><span class="sub-text">Our Lady of the Lake Ascension Hospital</span></label>
+            <label class="subloc-item"><input type="radio" name="blood-loc" value="Prevost Memorial Hospital" onchange="syncSubLocs('blood-loc')" /><span class="rb"></span><span class="sub-text">Prevost Memorial Hospital</span></label>
+          </div>
+          <div>
+            <span class="f-label">Time of Blood Draw</span>
+            <input class="f-input" id="blood-time" type="text" maxlength="4" placeholder="e.g. 2315" oninput="render()" autocomplete="off" />
+            <span class="f-note">24-hr format — printed as "xxxx hours"</span>
+          </div>
+          <div>
+            <span class="f-label">Who Drew the Blood</span>
+            <input class="f-input" id="blood-drawer" type="text" placeholder="Include title" oninput="render()" autocomplete="off" />
+            <span class="f-note">Include full title (e.g. "RN Jane Doe")</span>
+          </div>
+          <div>
+            <span class="f-label">Blood Kit Number</span>
+            <input class="f-input" id="blood-kit" type="text" placeholder="Include 'BA'" oninput="render()" autocomplete="off" />
+            <span class="f-note">Include "BA" prefix (e.g. "BA123456")</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div><!-- /sb-body -->
 
   <div class="sb-foot">
@@ -533,17 +683,33 @@
         <p class="rp-para" id="p-ols"></p>
       </div>
 
+      <div class="rp-section">
+        <div class="section-pill pill-intox">
+          <svg width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="currentColor"/></svg>
+          Intox
+        </div>
+        <p class="rp-para" id="p-intox"></p>
+        <div id="blood-para" style="display:none" class="rp-blood-para">
+          <div class="section-pill pill-blood" style="margin-bottom:11px">
+            <svg width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="currentColor"/></svg>
+            Blood Draw
+          </div>
+          <p class="rp-para" id="p-blood"></p>
+        </div>
+      </div>
+
     </div>
   </div>
 </main>
 
 <script>
   // ── State ────────────────────────────────────────────────────────
-  let gender = 'male';
+  let gender     = 'male';
+  let intoxParish = null, rightsSign = null, blowResult = null, bloodParish = null;
 
   const P = {
-    male:   { he: 'he',  him: 'him', his: 'his', she: 'he',  her: 'him' },
-    female: { he: 'she', him: 'her', his: 'her', she: 'she', her: 'her' }
+    male:   { he: 'he',  him: 'him', his: 'his' },
+    female: { he: 'she', him: 'her', his: 'her' }
   };
 
   // ── Helpers ──────────────────────────────────────────────────────
@@ -552,26 +718,25 @@
   function v(id)   { return $id(id).value.trim(); }
   function esc(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  function cap(s) {
-    return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-  }
-
-  // Oxford-comma list builder
   function list(items) {
-    if (!items.length)  return '';
-    if (items.length === 1) return items[0];
-    if (items.length === 2) return items[0] + ' and ' + items[1];
-    return items.slice(0, -1).join(', ') + ', and ' + items[items.length - 1];
+    if (!items.length)    return '';
+    if (items.length ===1) return items[0];
+    if (items.length ===2) return items[0] + ' and ' + items[1];
+    return items.slice(0,-1).join(', ') + ', and ' + items[items.length-1];
   }
 
-  // Wrap name in <mark> for the preview
   function nm(raw) {
-    return raw
-      ? `<mark>${esc(raw)}</mark>`
-      : '<mark>[Subject Name]</mark>';
+    return raw ? `<mark>${esc(raw)}</mark>` : '<mark>[Subject Name]</mark>';
   }
 
-  // ── UI helpers ───────────────────────────────────────────────────
+  function ph(text) { return `<mark>${text}</mark>`; }
+
+  function getRadioVal(name) {
+    const r = document.querySelector(`input[name="${name}"]:checked`);
+    return r ? r.value : null;
+  }
+
+  // ── FST checkbox helpers ─────────────────────────────────────────
   function tick(cb, lblId) {
     $id(lblId).classList.toggle('on', cb.checked);
     render();
@@ -579,18 +744,66 @@
 
   function setGender(g) {
     gender = g;
-    $id('g-male').classList.toggle('active',   g === 'male');
-    $id('g-female').classList.toggle('active', g === 'female');
+    $id('g-male').classList.toggle('active',   g==='male');
+    $id('g-female').classList.toggle('active', g==='female');
+    render();
+  }
+
+  // ── INTOX helpers ────────────────────────────────────────────────
+  function syncSubLocs(name) {
+    document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+      r.closest('.subloc-item').classList.toggle('sel', r.checked);
+    });
+    render();
+  }
+
+  function setIntoxParish(p) {
+    intoxParish = p;
+    $id('ip-ebr').classList.toggle('active', p==='ebr');
+    $id('ip-asc').classList.toggle('active', p==='ascension');
+    document.querySelectorAll('input[name="intox-loc"]').forEach(r => {
+      r.checked = false;
+      r.closest('.subloc-item').classList.remove('sel');
+    });
+    $id('ip-ebr-locs').style.display = p==='ebr'        ? 'flex' : 'none';
+    $id('ip-asc-locs').style.display = p==='ascension'  ? 'flex' : 'none';
+    render();
+  }
+
+  function setRightsSign(s) {
+    rightsSign = s;
+    $id('rs-yes').classList.toggle('active', s==='yes');
+    $id('rs-no').classList.toggle('active',  s==='no');
+    render();
+  }
+
+  function setBlow(b) {
+    blowResult = b;
+    $id('blow-yes').classList.toggle('active', b==='yes');
+    $id('blow-no').classList.toggle('active',  b==='no');
+    $id('blow-yes-fields').style.display = b==='yes' ? 'flex' : 'none';
+    $id('blow-no-fields').style.display  = b==='no'  ? 'flex' : 'none';
+    render();
+  }
+
+  function setBloodParish(p) {
+    bloodParish = p;
+    $id('bp-ebr').classList.toggle('active', p==='ebr');
+    $id('bp-asc').classList.toggle('active', p==='ascension');
+    document.querySelectorAll('input[name="blood-loc"]').forEach(r => {
+      r.checked = false;
+      r.closest('.subloc-item').classList.remove('sel');
+    });
+    $id('bp-ebr-locs').style.display = p==='ebr'        ? 'flex' : 'none';
+    $id('bp-asc-locs').style.display = p==='ascension'  ? 'flex' : 'none';
     render();
   }
 
   // ── Render ───────────────────────────────────────────────────────
   function render() {
     const raw  = v('s-name');
-    const name = raw || 'the subject';
     const p    = P[gender];
 
-    // Header meta
     $id('rp-meta').innerHTML = `Subject: <b>${esc(raw || '—')}</b>`;
 
     // ── HGN ──
@@ -601,12 +814,8 @@
 
     let hgn = `The first test I administered was Horizontal Gaze Nystagmus (HGN). `
             + `I explained the test to ${nm(raw)}, asking ${p.him} if ${p.he} understood the instructions.`;
-    if (hgnObs.length) {
-      hgn += ` During this test, I observed ${list(hgnObs)}.`;
-    }
-    if (on('hgn4')) {
-      hgn += ` I additionally observed vertical nystagmus.`;
-    }
+    if (hgnObs.length) hgn += ` During this test, I observed ${list(hgnObs)}.`;
+    if (on('hgn4'))    hgn += ` I additionally observed vertical nystagmus.`;
 
     // ── WAT ──
     const s1 = v('st1') || '___';
@@ -614,9 +823,7 @@
 
     let wat = `The second test I administered was Walk-and-Turn. `
             + `I explained and demonstrated the test to ${nm(raw)}.`;
-    if (on('wat1')) {
-      wat += ` During the instruction phase, ${nm(raw)} stepped out of the starting position.`;
-    }
+    if (on('wat1')) wat += ` During the instruction phase, ${nm(raw)} stepped out of the starting position.`;
     wat += ` After ${nm(raw)} stated ${p.he} did not have any questions, I told ${p.him} to begin.`;
 
     const watBeh = [];
@@ -624,10 +831,7 @@
     if (on('wat3')) watBeh.push('missed heel-to-toe');
     if (on('wat4')) watBeh.push('stepped off the line');
     if (on('wat5')) watBeh.push('raised their arms');
-
-    if (watBeh.length) {
-      wat += ` ${nm(raw)} ${list(watBeh)}.`;
-    }
+    if (watBeh.length) wat += ` ${nm(raw)} ${list(watBeh)}.`;
     wat += ` ${nm(raw)} took ${esc(s1)} steps on the first nine and ${esc(s2)} steps on the second nine.`;
 
     // ── OLS ──
@@ -639,32 +843,90 @@
 
     let ols = `The final test I administered was One Leg Stand. `
             + `I explained and demonstrated the test to ${nm(raw)}.`;
-    if (olsBeh.length) {
-      ols += ` During this test, ${nm(raw)} ${list(olsBeh)}.`;
-    }
+    if (olsBeh.length) ols += ` During this test, ${nm(raw)} ${list(olsBeh)}.`;
 
     $id('p-hgn').innerHTML = hgn;
     $id('p-wat').innerHTML = wat;
     $id('p-ols').innerHTML = ols;
+
+    // ── INTOX ──
+    const intoxLoc = getRadioVal('intox-loc');
+    const rightsH  = v('rights-hours');
+    const bac      = v('bac');
+    const intoxT   = v('intox-time');
+    const judgeN   = v('judge-name');
+    const bloodLoc = getRadioVal('blood-loc');
+    const bloodT   = v('blood-time');
+    const bloodDr  = v('blood-drawer');
+    const bloodKit = v('blood-kit');
+
+    let intoxP = `I transported ${nm(raw)} to `
+               + (intoxLoc ? esc(intoxLoc) : ph('[INTOX LOCATION]'))
+               + ` for chemical testing. I read ${p.him} the Rights Relating to the Chemical Test`
+               + ` for Impairment Form at `
+               + (rightsH ? esc(rightsH) + ' hours' : ph('[TIME]'))
+               + ` which they `;
+
+    if      (rightsSign === 'yes') intoxP += 'indicated they understood and signed.';
+    else if (rightsSign === 'no')  intoxP += 'refused to sign.';
+    else                           intoxP += ph('[RIGHTS SIGN]') + '.';
+
+    intoxP += ` After the required 15 minute observation window, ${nm(raw)} `;
+
+    if (blowResult === 'yes') {
+      intoxP += `provided a valid breath sample of `
+              + (bac ? esc(bac) : ph('[BAC]'))
+              + ` at `
+              + (intoxT ? esc(intoxT) + ' hours' : ph('[TIME]'))
+              + `.`;
+    } else if (blowResult === 'no') {
+      intoxP += `refused to provide.`;
+    } else {
+      intoxP += ph('[RESULT]') + '.';
+    }
+
+    $id('p-intox').innerHTML = intoxP;
+
+    // Blood warrant paragraph (only when blow = no)
+    let bloodP = '';
+    if (blowResult === 'no') {
+      bloodP  = `I then transported ${nm(raw)} to `
+              + (bloodLoc ? esc(bloodLoc) : ph('[BLOOD LOCATION]'))
+              + ` for a blood draw. I drafted a blood warrant which was signed by `
+              + (judgeN ? esc(judgeN) : ph('[JUDGE NAME]'))
+              + `. Two vials of blood were collected from ${nm(raw)} by `
+              + (bloodDr ? esc(bloodDr) : ph('[BLOOD DRAWER]'))
+              + ` at `
+              + (bloodT ? esc(bloodT) + ' hours' : ph('[TIME]'))
+              + ` using Blood Kit `
+              + (bloodKit ? esc(bloodKit) : ph('[BLOOD KIT]'))
+              + `.`;
+    }
+    $id('p-blood').innerHTML = bloodP;
+    $id('blood-para').style.display = blowResult === 'no' ? 'block' : 'none';
   }
 
   // ── Copy plain text ──────────────────────────────────────────────
   function copyText() {
-    // Build plain-text version (strip HTML tags)
     function plain(html) {
       const d = document.createElement('div');
       d.innerHTML = html;
       return d.textContent;
     }
-    const text = [
+    const parts = [
       plain($id('p-hgn').innerHTML),
       '',
       plain($id('p-wat').innerHTML),
       '',
-      plain($id('p-ols').innerHTML)
-    ].join('\n');
-
-    navigator.clipboard.writeText(text).then(() => {
+      plain($id('p-ols').innerHTML),
+      '',
+      plain($id('p-intox').innerHTML),
+    ];
+    if (blowResult === 'no') {
+      parts.push('');
+      parts.push(plain($id('p-blood').innerHTML));
+    }
+    navigator.clipboard.writeText(parts.join('\n')).then(() => {
       const btn = $id('copy-btn');
       const prev = btn.textContent;
       btn.textContent = 'Copied!';
@@ -675,6 +937,8 @@
   // ── Clear ────────────────────────────────────────────────────────
   function clearAll() {
     if (!confirm('Clear all fields and checkboxes?')) return;
+
+    // FST fields
     $id('s-name').value = '';
     $id('st1').value = '';
     $id('st2').value = '';
@@ -684,6 +948,20 @@
       $id(id).checked = false;
       $id('l-' + id).classList.remove('on');
     });
+
+    // INTOX fields
+    intoxParish = null; rightsSign = null; blowResult = null; bloodParish = null;
+    ['ip-ebr','ip-asc','rs-yes','rs-no','blow-yes','blow-no','bp-ebr','bp-asc']
+      .forEach(id => $id(id).classList.remove('active'));
+    ['ip-ebr-locs','ip-asc-locs','blow-yes-fields','blow-no-fields','bp-ebr-locs','bp-asc-locs']
+      .forEach(id => { $id(id).style.display = 'none'; });
+    document.querySelectorAll('input[name="intox-loc"], input[name="blood-loc"]').forEach(r => {
+      r.checked = false;
+      r.closest('.subloc-item').classList.remove('sel');
+    });
+    ['rights-hours','bac','intox-time','judge-name','blood-time','blood-drawer','blood-kit']
+      .forEach(id => { $id(id).value = ''; });
+
     setGender('male');
     render();
   }
