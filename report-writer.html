@@ -298,6 +298,7 @@
     .pill-ols   { background: #f0fdf4; color: var(--ols); border: 1px solid #bbf7d0; }
     .pill-intox { background: #fffbeb; color: #b45309;   border: 1px solid #fde68a; }
     .pill-blood { background: #fff1f2; color: #be123c;   border: 1px solid #fecdd3; }
+    .pill-enc   { background: #ecfeff; color: #0e7490;   border: 1px solid #a5f3fc; }
 
     .part-divider {
       display: flex; align-items: center; gap: 10px;
@@ -491,6 +492,119 @@
             <button id="g-female"          onclick="setGender('female')">Female</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Encounter -->
+    <div class="fc">
+      <div class="fc-head">
+        <div class="fc-dot" style="background:#0e7490"></div>
+        <h2>Encounter</h2>
+      </div>
+      <div class="fc-body">
+        <div class="step-row">
+          <div>
+            <span class="f-label">Date</span>
+            <input class="f-input" id="enc-date" type="text" placeholder="MM/DD/YYYY" oninput="render()" autocomplete="off" />
+          </div>
+          <div>
+            <span class="f-label">Time</span>
+            <input class="f-input" id="enc-time" type="text" maxlength="4" placeholder="e.g. 2215" oninput="render()" autocomplete="off" />
+            <span class="f-note">24-hr format</span>
+          </div>
+        </div>
+        <div>
+          <span class="f-label">Trooper / Officer</span>
+          <input class="f-input" id="enc-trooper" type="text" placeholder="Include rank/title" oninput="render()" autocomplete="off" />
+        </div>
+        <div class="step-row">
+          <div>
+            <span class="f-label">Direction</span>
+            <input class="f-input" id="enc-dir" type="text" placeholder="e.g. northbound" oninput="render()" autocomplete="off" />
+          </div>
+          <div>
+            <span class="f-label">Roadway</span>
+            <input class="f-input" id="enc-road" type="text" placeholder="e.g. I-10" oninput="render()" autocomplete="off" />
+          </div>
+        </div>
+        <div>
+          <span class="f-label">Vehicle Make / Model</span>
+          <input class="f-input" id="enc-vehicle" type="text" placeholder="e.g. 2020 Ford F-150" oninput="render()" autocomplete="off" />
+        </div>
+        <div>
+          <span class="f-label">Violation Observed</span>
+          <input class="f-input" id="enc-violation" type="text" placeholder="e.g. improper lane usage" oninput="render()" autocomplete="off" />
+        </div>
+        <div>
+          <span class="f-label">Final Stop Location</span>
+          <input class="f-input" id="enc-stoploc" type="text" placeholder="Address or description" oninput="render()" autocomplete="off" />
+        </div>
+        <div>
+          <span class="f-label">Coming From (Start Location)</span>
+          <input class="f-input" id="enc-startloc" type="text" placeholder="e.g. a bar on Main St" oninput="render()" autocomplete="off" />
+        </div>
+        <div>
+          <span class="f-label">Beverage Claimed</span>
+          <input class="f-input" id="enc-bev" type="text" placeholder="e.g. two beers" oninput="render()" autocomplete="off" />
+        </div>
+
+        <span class="f-label" style="margin-top:4px">Initial Observations</span>
+        <div style="display:flex; flex-direction:column; gap:5px">
+          <label class="cb-item" id="l-enc-bal1">
+            <input type="checkbox" id="enc-bal1" onchange="tick(this,'l-enc-bal1')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Was unsteady on feet</span>
+          </label>
+          <label class="cb-item" id="l-enc-bal2">
+            <input type="checkbox" id="enc-bal2" onchange="tick(this,'l-enc-bal2')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Was swaying</span>
+          </label>
+          <label class="cb-item" id="l-enc-bal3">
+            <input type="checkbox" id="enc-bal3" onchange="tick(this,'l-enc-bal3')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Was leaning against vehicle</span>
+          </label>
+          <div>
+            <span class="f-label" style="margin-bottom:5px">Bloodshot / Watery Eyes</span>
+            <div class="gender-seg">
+              <button id="ey-yes" onclick="setEyes('yes')">Yes</button>
+              <button id="ey-no"  onclick="setEyes('no')">No</button>
+            </div>
+          </div>
+          <label class="cb-item" id="l-enc-odor">
+            <input type="checkbox" id="enc-odor" onchange="tick(this,'l-enc-odor');toggleOdorSub(this.checked)" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Odor of alcoholic beverage</span>
+          </label>
+          <div id="odor-sub" style="display:none; flex-direction:column; gap:4px">
+            <label class="subloc-item"><input type="radio" name="odor-int" value="a strong" onchange="syncSubLocs('odor-int')" /><span class="rb"></span><span class="sub-text">Strong</span></label>
+            <label class="subloc-item"><input type="radio" name="odor-int" value="a moderate" onchange="syncSubLocs('odor-int')" /><span class="rb"></span><span class="sub-text">Moderate</span></label>
+            <label class="subloc-item"><input type="radio" name="odor-int" value="a faint" onchange="syncSubLocs('odor-int')" /><span class="rb"></span><span class="sub-text">Faint</span></label>
+          </div>
+          <label class="cb-item" id="l-enc-sp1">
+            <input type="checkbox" id="enc-sp1" onchange="tick(this,'l-enc-sp1')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Had slurred speech</span>
+          </label>
+          <label class="cb-item" id="l-enc-sp2">
+            <input type="checkbox" id="enc-sp2" onchange="tick(this,'l-enc-sp2')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Was mumbling</span>
+          </label>
+          <label class="cb-item" id="l-enc-sp3">
+            <input type="checkbox" id="enc-sp3" onchange="tick(this,'l-enc-sp3')" />
+            <span class="cb-box"><svg class="cb-tick" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg></span>
+            <span class="cb-text">Had thick-tongued speech</span>
+          </label>
+        </div>
+
+        <span class="f-label" style="margin-top:4px">SFST Consent</span>
+        <div class="gender-seg">
+          <button id="sfst-yes" onclick="setSFST('yes')">Agreed</button>
+          <button id="sfst-no"  onclick="setSFST('no')">Refused</button>
+        </div>
+
       </div>
     </div>
 
@@ -753,6 +867,17 @@
     <div class="rp-body">
 
       <div class="rp-section">
+        <div class="section-pill pill-enc">
+          <svg width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="currentColor"/></svg>
+          Encounter
+        </div>
+        <p class="rp-para" id="p-enc1"></p>
+        <p class="rp-para" id="p-enc2" style="margin-top:12px"></p>
+      </div>
+
+      <div id="fst-sections">
+
+      <div class="rp-section">
         <div class="section-pill pill-hgn">
           <svg width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="currentColor"/></svg>
           HGN
@@ -776,6 +901,8 @@
         <p class="rp-para" id="p-ols"></p>
       </div>
 
+      </div><!-- /fst-sections -->
+
       <div class="rp-section">
         <div class="section-pill pill-intox">
           <svg width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="currentColor"/></svg>
@@ -797,8 +924,9 @@
 
 <script>
   // ── State ────────────────────────────────────────────────────────
-  let gender     = 'male';
+  let gender = 'male';
   let intoxParish = null, rightsSign = null, blowResult = null, bloodParish = null;
+  let eyesObs = null, sfstConsent = null;
 
   const P = {
     male:   { he: 'he',  him: 'him', his: 'his' },
@@ -812,9 +940,9 @@
   function esc(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   function list(items) {
-    if (!items.length)    return '';
-    if (items.length ===1) return items[0];
-    if (items.length ===2) return items[0] + ' and ' + items[1];
+    if (!items.length)     return '';
+    if (items.length === 1) return items[0];
+    if (items.length === 2) return items[0] + ' and ' + items[1];
     return items.slice(0,-1).join(', ') + ', and ' + items[items.length-1];
   }
 
@@ -829,7 +957,7 @@
     return r ? r.value : null;
   }
 
-  // ── FST checkbox helpers ─────────────────────────────────────────
+  // ── Checkbox / gender helpers ─────────────────────────────────────
   function tick(cb, lblId) {
     $id(lblId).classList.toggle('on', cb.checked);
     render();
@@ -837,12 +965,32 @@
 
   function setGender(g) {
     gender = g;
-    $id('g-male').classList.toggle('active',   g==='male');
-    $id('g-female').classList.toggle('active', g==='female');
+    $id('g-male').classList.toggle('active',   g === 'male');
+    $id('g-female').classList.toggle('active', g === 'female');
     render();
   }
 
-  // ── INTOX helpers ────────────────────────────────────────────────
+  // ── Encounter helpers ─────────────────────────────────────────────
+  function setEyes(e) {
+    eyesObs = e;
+    $id('ey-yes').classList.toggle('active', e === 'yes');
+    $id('ey-no').classList.toggle('active',  e === 'no');
+    render();
+  }
+
+  function setSFST(s) {
+    sfstConsent = s;
+    $id('sfst-yes').classList.toggle('active', s === 'yes');
+    $id('sfst-no').classList.toggle('active',  s === 'no');
+    $id('fst-sections').style.display = s === 'no' ? 'none' : 'block';
+    render();
+  }
+
+  function toggleOdorSub(checked) {
+    $id('odor-sub').style.display = checked ? 'flex' : 'none';
+  }
+
+  // ── INTOX helpers ─────────────────────────────────────────────────
   function syncSubLocs(name) {
     document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
       r.closest('.subloc-item').classList.toggle('sel', r.checked);
@@ -852,52 +1000,91 @@
 
   function setIntoxParish(p) {
     intoxParish = p;
-    $id('ip-ebr').classList.toggle('active', p==='ebr');
-    $id('ip-asc').classList.toggle('active', p==='ascension');
+    $id('ip-ebr').classList.toggle('active', p === 'ebr');
+    $id('ip-asc').classList.toggle('active', p === 'ascension');
     document.querySelectorAll('input[name="intox-loc"]').forEach(r => {
       r.checked = false;
       r.closest('.subloc-item').classList.remove('sel');
     });
-    $id('ip-ebr-locs').style.display = p==='ebr'        ? 'flex' : 'none';
-    $id('ip-asc-locs').style.display = p==='ascension'  ? 'flex' : 'none';
+    $id('ip-ebr-locs').style.display = p === 'ebr'       ? 'flex' : 'none';
+    $id('ip-asc-locs').style.display = p === 'ascension' ? 'flex' : 'none';
     render();
   }
 
   function setRightsSign(s) {
     rightsSign = s;
-    $id('rs-yes').classList.toggle('active', s==='yes');
-    $id('rs-no').classList.toggle('active',  s==='no');
+    $id('rs-yes').classList.toggle('active', s === 'yes');
+    $id('rs-no').classList.toggle('active',  s === 'no');
     render();
   }
 
   function setBlow(b) {
     blowResult = b;
-    $id('blow-yes').classList.toggle('active', b==='yes');
-    $id('blow-no').classList.toggle('active',  b==='no');
-    $id('blow-yes-fields').style.display = b==='yes' ? 'flex' : 'none';
-    $id('blow-no-fields').style.display  = b==='no'  ? 'flex' : 'none';
+    $id('blow-yes').classList.toggle('active', b === 'yes');
+    $id('blow-no').classList.toggle('active',  b === 'no');
+    $id('blow-yes-fields').style.display = b === 'yes' ? 'flex' : 'none';
+    $id('blow-no-fields').style.display  = b === 'no'  ? 'flex' : 'none';
     render();
   }
 
   function setBloodParish(p) {
     bloodParish = p;
-    $id('bp-ebr').classList.toggle('active', p==='ebr');
-    $id('bp-asc').classList.toggle('active', p==='ascension');
+    $id('bp-ebr').classList.toggle('active', p === 'ebr');
+    $id('bp-asc').classList.toggle('active', p === 'ascension');
     document.querySelectorAll('input[name="blood-loc"]').forEach(r => {
       r.checked = false;
       r.closest('.subloc-item').classList.remove('sel');
     });
-    $id('bp-ebr-locs').style.display = p==='ebr'        ? 'flex' : 'none';
-    $id('bp-asc-locs').style.display = p==='ascension'  ? 'flex' : 'none';
+    $id('bp-ebr-locs').style.display = p === 'ebr'       ? 'flex' : 'none';
+    $id('bp-asc-locs').style.display = p === 'ascension' ? 'flex' : 'none';
     render();
   }
 
-  // ── Render ───────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────
   function render() {
-    const raw  = v('s-name');
-    const p    = P[gender];
+    const raw = v('s-name');
+    const p   = P[gender];
 
     $id('rp-meta').innerHTML = `Subject: <b>${esc(raw || '—')}</b>`;
+
+    // ── ENCOUNTER ──
+    const encDate      = v('enc-date');
+    const encTime      = v('enc-time');
+    const encTrooper   = v('enc-trooper');
+    const encDir       = v('enc-dir');
+    const encRoad      = v('enc-road');
+    const encVehicle   = v('enc-vehicle');
+    const encViolation = v('enc-violation');
+    const encStopLoc   = v('enc-stoploc');
+    const encStartLoc  = v('enc-startloc');
+    const encBev       = v('enc-bev');
+
+    const enc1 = `On ${encDate ? esc(encDate) : ph('[DATE]')}, at approximately ${encTime ? esc(encTime) + ' hours' : ph('[TIME]')}, I, ${encTrooper ? esc(encTrooper) : ph('[TROOPER]')}, was patrolling ${encDir ? esc(encDir) : ph('[DIRECTION]')} on ${encRoad ? esc(encRoad) : ph('[ROADWAY]')} when I observed ${encViolation ? esc(encViolation) : ph('[VIOLATION]')}. I initiated a traffic stop using the emergency lights on my marked unit. The final stop location was ${encStopLoc ? esc(encStopLoc) : ph('[STOP LOCATION]')}.`;
+
+    const initObs = [];
+    if (on('enc-bal1')) initObs.push(`was unsteady on ${p.his} feet`);
+    if (on('enc-bal2')) initObs.push('was swaying');
+    if (on('enc-bal3')) initObs.push(`was leaning against ${p.his} vehicle`);
+    if (eyesObs === 'yes') initObs.push('had bloodshot, watery eyes');
+    if (on('enc-odor')) {
+      const odorInt = getRadioVal('odor-int');
+      initObs.push(odorInt ? `${odorInt} odor of an alcoholic beverage` : ph('[ODOR INTENSITY]') + ' odor of an alcoholic beverage');
+    }
+    if (on('enc-sp1')) initObs.push('had slurred speech');
+    if (on('enc-sp2')) initObs.push('was mumbling');
+    if (on('enc-sp3')) initObs.push('had thick-tongued speech');
+
+    let enc2 = `Upon coming into contact with the driver`;
+    if (encVehicle) enc2 += ` of a ${esc(encVehicle)}`;
+    enc2 += `, later identified as ${nm(raw)}, I observed ${nm(raw)} `;
+    enc2 += initObs.length ? list(initObs) : ph('[OBSERVATIONS]');
+    enc2 += `. I asked ${nm(raw)} where ${p.he} was coming from and ${nm(raw)} stated ${p.he} was coming from ${encStartLoc ? esc(encStartLoc) : ph('[START LOCATION]')}. I asked ${nm(raw)} if they had consumed any alcoholic beverages and ${p.he} stated ${p.he} had consumed ${encBev ? esc(encBev) : ph('[BEVERAGE]')}. Due to my observations of ${nm(raw)}, I asked ${p.him} to perform Standardized Field Sobriety Tests and ${p.he} `;
+    if      (sfstConsent === 'yes') enc2 += 'agreed to do so.';
+    else if (sfstConsent === 'no')  enc2 += 'refused.';
+    else                            enc2 += ph('[AGREED/REFUSED]') + '.';
+
+    $id('p-enc1').innerHTML = enc1;
+    $id('p-enc2').innerHTML = enc2;
 
     // ── HGN ──
     const hgnObs = [];
@@ -980,26 +1167,26 @@
 
     $id('p-intox').innerHTML = intoxP;
 
-    // Blood warrant paragraph (only when blow = no)
+    // Blood paragraph (only when blow = no)
     let bloodP = '';
     if (blowResult === 'no') {
-      bloodP  = `I then transported ${nm(raw)} to `
-              + (bloodLoc ? esc(bloodLoc) : ph('[BLOOD LOCATION]'))
-              + ` for a blood draw. I drafted a blood warrant which was signed by `
-              + (judgeN ? esc(judgeN) : ph('[JUDGE NAME]'))
-              + `. Two vials of blood were collected from ${nm(raw)} by `
-              + (bloodDr ? esc(bloodDr) : ph('[BLOOD DRAWER]'))
-              + ` at `
-              + (bloodT ? esc(bloodT) + ' hours' : ph('[TIME]'))
-              + ` using Blood Kit `
-              + (bloodKit ? esc(bloodKit) : ph('[BLOOD KIT]'))
-              + `.`;
+      bloodP = `I then transported ${nm(raw)} to `
+             + (bloodLoc ? esc(bloodLoc) : ph('[BLOOD LOCATION]'))
+             + ` for a blood draw. I drafted a blood warrant which was signed by `
+             + (judgeN ? esc(judgeN) : ph('[JUDGE NAME]'))
+             + `. Two vials of blood were collected from ${nm(raw)} by `
+             + (bloodDr ? esc(bloodDr) : ph('[BLOOD DRAWER]'))
+             + ` at `
+             + (bloodT ? esc(bloodT) + ' hours' : ph('[TIME]'))
+             + ` using Blood Kit `
+             + (bloodKit ? esc(bloodKit) : ph('[BLOOD KIT]'))
+             + `.`;
     }
     $id('p-blood').innerHTML = bloodP;
     $id('blood-para').style.display = blowResult === 'no' ? 'block' : 'none';
   }
 
-  // ── Copy plain text ──────────────────────────────────────────────
+  // ── Copy plain text ───────────────────────────────────────────────
   function copyText() {
     function plain(html) {
       const d = document.createElement('div');
@@ -1007,17 +1194,18 @@
       return d.textContent;
     }
     const parts = [
-      plain($id('p-hgn').innerHTML),
+      plain($id('p-enc1').innerHTML),
       '',
-      plain($id('p-wat').innerHTML),
-      '',
-      plain($id('p-ols').innerHTML),
-      '',
-      plain($id('p-intox').innerHTML),
+      plain($id('p-enc2').innerHTML),
     ];
+    if (sfstConsent !== 'no') {
+      parts.push('', plain($id('p-hgn').innerHTML));
+      parts.push('', plain($id('p-wat').innerHTML));
+      parts.push('', plain($id('p-ols').innerHTML));
+    }
+    parts.push('', plain($id('p-intox').innerHTML));
     if (blowResult === 'no') {
-      parts.push('');
-      parts.push(plain($id('p-blood').innerHTML));
+      parts.push('', plain($id('p-blood').innerHTML));
     }
     navigator.clipboard.writeText(parts.join('\n')).then(() => {
       const btn = $id('copy-btn');
@@ -1027,9 +1215,25 @@
     });
   }
 
-  // ── Clear ────────────────────────────────────────────────────────
+  // ── Clear ─────────────────────────────────────────────────────────
   function clearAll() {
     if (!confirm('Clear all fields and checkboxes?')) return;
+
+    // Encounter fields
+    ['enc-date','enc-time','enc-trooper','enc-dir','enc-road','enc-vehicle',
+     'enc-violation','enc-stoploc','enc-startloc','enc-bev'].forEach(id => { $id(id).value = ''; });
+    ['enc-bal1','enc-bal2','enc-bal3','enc-odor','enc-sp1','enc-sp2','enc-sp3'].forEach(id => {
+      $id(id).checked = false;
+      $id('l-' + id).classList.remove('on');
+    });
+    eyesObs = null; sfstConsent = null;
+    ['ey-yes','ey-no','sfst-yes','sfst-no'].forEach(id => $id(id).classList.remove('active'));
+    $id('odor-sub').style.display = 'none';
+    $id('fst-sections').style.display = 'block';
+    document.querySelectorAll('input[name="odor-int"]').forEach(r => {
+      r.checked = false;
+      r.closest('.subloc-item').classList.remove('sel');
+    });
 
     // FST fields
     $id('s-name').value = '';
@@ -1059,7 +1263,7 @@
     render();
   }
 
-  // ── Disclaimer ───────────────────────────────────────────────────
+  // ── Disclaimer ────────────────────────────────────────────────────
   function acceptDisclaimer(cb) {
     const lbl = $id('ov-accept-lbl');
     lbl.classList.toggle('on', cb.checked);
@@ -1070,7 +1274,7 @@
     }
   }
 
-  // ── Init ─────────────────────────────────────────────────────────
+  // ── Init ──────────────────────────────────────────────────────────
   render();
 </script>
 </body>
