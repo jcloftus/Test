@@ -24,13 +24,13 @@
       --ols: #059669;
     }
 
-    html, body { height: 100%; }
+    html, body { height: 100%; overflow: hidden; }
 
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: var(--main-bg);
       display: flex;
-      min-height: 100vh;
+      height: 100%;
       font-size: 14px;
       color: var(--text);
     }
@@ -348,10 +348,79 @@
       font-weight: 500;
     }
 
+    /* ── Disclaimer overlay ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 11, 20, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity .45s ease, visibility .45s ease;
+    }
+    .overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .overlay-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 36px;
+      max-width: 490px;
+      width: calc(100% - 32px);
+      box-shadow: 0 24px 64px rgba(0,0,0,.45);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      animation: cardIn .35s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes cardIn {
+      from { transform: translateY(18px) scale(.97); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+
+    .ov-icon {
+      width: 50px; height: 50px;
+      background: #0b1120;
+      border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ov-name { font-size: 1.35rem; font-weight: 800; color: #0b1120; letter-spacing: -.4px; margin-top: 2px; }
+    .ov-sub  { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.1px; color: #3e7bfa; }
+    .ov-rule { height: 1px; background: #eef2f7; }
+    .ov-body { font-size: .84rem; line-height: 1.72; color: #64748b; }
+
+    .ov-accept {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 15px;
+      border-radius: 10px;
+      background: #f8faff;
+      border: 1.5px solid #dce8ff;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color .15s, background .15s;
+    }
+    .ov-accept:hover { background: #f0f5ff; border-color: #b8d0ff; }
+    .ov-accept input[type="checkbox"] { display: none; }
+    .ov-box {
+      width: 18px; height: 18px; min-width: 18px;
+      border-radius: 5px; border: 2px solid #c8d6e8;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px; transition: all .15s;
+    }
+    .ov-tick { display: none; }
+    .ov-accept.on .ov-box  { background: #3e7bfa; border-color: #3e7bfa; }
+    .ov-accept.on .ov-tick { display: block; }
+    .ov-accept.on { border-color: rgba(62,123,250,.4); background: rgba(62,123,250,.05); }
+    .ov-text { font-size: .82rem; line-height: 1.55; color: #374151; font-weight: 500; }
+    .ov-accept.on .ov-text { color: #1e3a7c; }
+
     /* Print */
     @media print {
-      .sidebar { display: none !important; }
-      .main { padding: 0; }
+      .overlay  { display: none !important; }
+      .sidebar  { display: none !important; }
+      .main     { padding: 0; }
       .report-paper { max-width: 100%; border-radius: 0; box-shadow: none; }
       .rp-head { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .section-pill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -366,6 +435,35 @@
   </style>
 </head>
 <body>
+
+<!-- ══ DISCLAIMER OVERLAY ════════════════════════════════════════ -->
+<div id="disclaimer-overlay" class="overlay">
+  <div class="overlay-card">
+    <div class="ov-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3e7bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    </div>
+    <div>
+      <div class="ov-name">Reportilyzer</div>
+      <div class="ov-sub">Disclaimer</div>
+    </div>
+    <div class="ov-rule"></div>
+    <p class="ov-body">
+      This tool is provided as a writing aid only. The Reportilyzer is not responsible for any mistakes, user errors, or inaccuracies in reports generated using this tool. All output should be carefully reviewed for accuracy, completeness, and compliance before official use. The user assumes full responsibility for the content of any report produced.
+    </p>
+    <div class="ov-rule"></div>
+    <label class="ov-accept" id="ov-accept-lbl">
+      <input type="checkbox" id="disclaimer-cb" onchange="acceptDisclaimer(this)" />
+      <span class="ov-box">
+        <svg class="ov-tick" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1.5 6 4.5 9 10.5 3"/>
+        </svg>
+      </span>
+      <span class="ov-text">By checking this box I accept responsibility for any errors or mistakes caused by using the Reportilyzer.</span>
+    </label>
+  </div>
+</div>
 
 <!-- ══ SIDEBAR ══════════════════════════════════════════════════ -->
 <aside class="sidebar">
@@ -964,6 +1062,17 @@
 
     setGender('male');
     render();
+  }
+
+  // ── Disclaimer ───────────────────────────────────────────────────
+  function acceptDisclaimer(cb) {
+    const lbl = $id('ov-accept-lbl');
+    lbl.classList.toggle('on', cb.checked);
+    if (cb.checked) {
+      setTimeout(() => {
+        $id('disclaimer-overlay').classList.add('hidden');
+      }, 380);
+    }
   }
 
   // ── Init ─────────────────────────────────────────────────────────
